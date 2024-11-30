@@ -30,7 +30,19 @@ void sendmsg (char *user, char *target, char *msg) {
 	// TODO:
 	// Send a request to the server to send the message (msg) to the target user (target)
 	// by creating the message structure and writing it to server's FIFO
+	struct message outMsg;
+    snprintf(outMsg.source, sizeof(outMsg.source), "%s", user);   // Set the source
+    snprintf(outMsg.target, sizeof(outMsg.target), "%s", target); // Set the target
+    snprintf(outMsg.msg, sizeof(outMsg.msg), "%s", msg);          // Set the message
 
+    int serverFIFO = open("serverFIFO", O_WRONLY);
+    if (serverFIFO == -1) {
+        perror("Error opening server FIFO");
+        return;
+    }
+
+    write(serverFIFO, &outMsg, sizeof(outMsg));
+    close(serverFIFO);
 
 
 
@@ -49,9 +61,23 @@ void* messageListener(void *arg) {
 	// Incoming message from [source]: [message]
 	// put an end of line at the end of the message
 
+	char fifoName[256];
+    snprintf(fifoName, sizeof(fifoName), "%s", uName); // Use the username as the FIFO name
+    int clientFIFO = open(fifoName, O_RDONLY);
+    if (clientFIFO == -1) {
+        perror("Error opening client FIFO");
+        pthread_exit((void*)-1);
+    }
 
+    struct message incomingMsg;
+    while (1) {
+        if (read(clientFIFO, &incomingMsg, sizeof(struct message)) > 0) {
+            printf("Incoming message from [%s]: [%s]\n", incomingMsg.source, incomingMsg.msg);
+        }
+    }
 
-
+    close(clientFIFO);
+    pthread_exit((void*)0);
 
 
 	pthread_exit((void*)0);
@@ -85,7 +111,11 @@ int main(int argc, char **argv) {
 
     // TODO:
     // create the message listener thread
-
+	pthread_t listenerThread;
+	if (pthread_create(&listenerThread, NULL, messageListener, NULL) != 0) {
+		perror("Error creating message listener thread");
+		exit(EXIT_FAILURE);
+	}
 
 
 
@@ -124,15 +154,20 @@ int main(int argc, char **argv) {
 		// if no message is specified, you should print the followingA
  		// printf("sendMsg: you have to enter a message\n");
 
+		char *target = strtok(NULL, " ");
+		char *msg = strtok(NULL, "");
+		
+		if (!target) {
+			printf("sendmsg: you have to specify target user\n");
+			continue;
+		}
 
+		if (!msg) {
+			printf("sendmsg: you have to enter a message\n");
+			continue;
+		}
 
-
-
-
-
-
-
-
+		sendmsg(uName, target, msg);
 		continue;
 	}
 
