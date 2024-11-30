@@ -30,25 +30,19 @@ void sendmsg (char *user, char *target, char *msg) {
 	// TODO:
 	// Send a request to the server to send the message (msg) to the target user (target)
 	// by creating the message structure and writing it to server's FIFO
-	struct message outMsg;
-    snprintf(outMsg.source, sizeof(outMsg.source), "%s", user);   // Set the source
-    snprintf(outMsg.target, sizeof(outMsg.target), "%s", target); // Set the target
-    snprintf(outMsg.msg, sizeof(outMsg.msg), "%s", msg);          // Set the message
-
+    struct message outMsg;
+    snprintf(outMsg.source, sizeof(outMsg.source), "%s", user);   // Sender's username
+    snprintf(outMsg.target, sizeof(outMsg.target), "%s", target); // Target user's username
+    snprintf(outMsg.msg, sizeof(outMsg.msg), "%s", msg);          // Message content
     int serverFIFO = open("serverFIFO", O_WRONLY);
     if (serverFIFO == -1) {
         perror("Error opening server FIFO");
         return;
     }
-
-    write(serverFIFO, &outMsg, sizeof(outMsg));
+    if (write(serverFIFO, &outMsg, sizeof(outMsg)) == -1) {
+        perror("Error writing to server FIFO");
+    }
     close(serverFIFO);
-
-
-
-
-
-
 
 }
 
@@ -117,9 +111,6 @@ int main(int argc, char **argv) {
 		exit(EXIT_FAILURE);
 	}
 
-
-
-
     while (1) {
 
 	fprintf(stderr,"rsh>");
@@ -154,9 +145,9 @@ int main(int argc, char **argv) {
 		// if no message is specified, you should print the followingA
  		// printf("sendMsg: you have to enter a message\n");
 
-		char *target = strtok(NULL, " ");
-		char *msg = strtok(NULL, "");
-		
+		char *target = strtok(NULL, " "); // Extract the target username
+		char *msg = strtok(NULL, "");    // Extract the rest of the input as the message
+
 		if (!target) {
 			printf("sendmsg: you have to specify target user\n");
 			continue;
@@ -167,6 +158,7 @@ int main(int argc, char **argv) {
 			continue;
 		}
 
+		// Call sendmsg with the parsed arguments
 		sendmsg(uName, target, msg);
 		continue;
 	}

@@ -47,8 +47,9 @@ int main() {
 			perror("Error opening target FIFO");
 			continue;
 		}
-
-		write(targetFIFO, &req, sizeof(req));
+		if (write(targetFIFO, &req, sizeof(req)) == -1) {
+			perror("Error writing to target FIFO");
+		}
 		close(targetFIFO);
 	}
 	close(server);
