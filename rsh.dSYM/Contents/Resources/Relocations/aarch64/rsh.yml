@@ -1,0 +1,13 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     rsh
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _terminate, symObjAddr: 0x0, symBinAddr: 0x100003470, symSize: 0x34 }
+  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _allowed, symObjAddr: 0x9F0, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x73, offset: 0x73, size: 0x8, addend: 0x0, symName: _uName, symBinAddr: 0x100008068, symSize: 0x0 }
+  - { offsetInCU: 0x8E, offset: 0x8E, size: 0x8, addend: 0x0, symName: _terminate, symObjAddr: 0x0, symBinAddr: 0x100003470, symSize: 0x34 }
+  - { offsetInCU: 0xB2, offset: 0xB2, size: 0x8, addend: 0x0, symName: _sendmsg, symObjAddr: 0x34, symBinAddr: 0x1000034A4, symSize: 0xF4 }
+  - { offsetInCU: 0x10E, offset: 0x10E, size: 0x8, addend: 0x0, symName: _messageListener, symObjAddr: 0x128, symBinAddr: 0x100003598, symSize: 0xCC }
+  - { offsetInCU: 0x162, offset: 0x162, size: 0x8, addend: 0x0, symName: _isAllowed, symObjAddr: 0x1F4, symBinAddr: 0x100003664, symSize: 0x8C }
+  - { offsetInCU: 0x198, offset: 0x198, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x280, symBinAddr: 0x1000036F0, symSize: 0x5B4 }
+...
