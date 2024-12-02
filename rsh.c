@@ -31,16 +31,14 @@ void sendmsg (char *user, char *target, char *msg) {
 	// Send a request to the server to send the message (msg) to the target user (target)
 	// by creating the message structure and writing it to server's FIFO
     struct message outMsg;
-    snprintf(outMsg.source, sizeof(outMsg.source), "%s", user);   // Sender's username
-    snprintf(outMsg.target, sizeof(outMsg.target), "%s", target); // Target user's username
-    snprintf(outMsg.msg, sizeof(outMsg.msg), "%s", msg);          // Message content
-    int serverFIFO = open("serverFIFO", O_WRONLY);
-    if (serverFIFO == -1) {
-        perror("Error opening server FIFO");
-        return;
-    }
-    if (write(serverFIFO, &outMsg, sizeof(outMsg)) == -1) {
-        perror("Error writing to server FIFO");
+    strcpy(outMsg.msg, msg);
+    strcpy(outMsg.target, target);
+    strcpy(outMsg.source, user);
+	int serverFIFO = open("serverFIFO", O_WRONLY);
+    if(serverFIFO != -1){
+        write(serverFIFO, &outMsg, sizeof(outMsg));
+    } else {
+        printf("rsh>Failed to open server FIFO");
     }
     close(serverFIFO);
 
@@ -72,9 +70,6 @@ void* messageListener(void *arg) {
 
     close(clientFIFO);
     pthread_exit((void*)0);
-
-
-	pthread_exit((void*)0);
 }
 
 int isAllowed(const char*cmd) {
