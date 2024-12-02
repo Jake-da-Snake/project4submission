@@ -53,18 +53,16 @@ void* messageListener(void *arg) {
 	// Incoming message from [source]: [message]
 	// put an end of line at the end of the message
 
-	char fifoName[256];
-    snprintf(fifoName, sizeof(fifoName), "%s", uName); // Use the username as the FIFO name
-    int clientFIFO = open(fifoName, O_RDONLY);
+    int clientFIFO = open((char*)arg, O_RDONLY);
     if (clientFIFO == -1) {
-        perror("Error opening client FIFO");
-        pthread_exit((void*)-1);
+        perror("Failed to open user FIFO");
+        pthread_exit((void*)1);
     }
 
     struct message incomingMsg;
     while (1) {
-        if (read(clientFIFO, &incomingMsg, sizeof(struct message)) > 0) {
-            printf("Incoming message from [%s]: [%s]\n", incomingMsg.source, incomingMsg.msg);
+        if (read(clientFIFO, &incomingMsg, sizeof(incomingMsg)) > 0) {
+            printf("Incoming message from %s: %s\n", incomingMsg.source, incomingMsg.msg);
         }
     }
 
@@ -101,9 +99,9 @@ int main(int argc, char **argv) {
     // TODO:
     // create the message listener thread
 	pthread_t listenerThread;
-	if (pthread_create(&listenerThread, NULL, messageListener, NULL) != 0) {
+	if (pthread_create(&listenerThread, NULL, messageListener, (void*)uName) != 0) {
 		perror("Error creating message listener thread");
-		exit(EXIT_FAILURE);
+		exit(1);
 	}
 
     while (1) {
@@ -143,12 +141,12 @@ int main(int argc, char **argv) {
 		char *target = strtok(NULL, " "); // Extract the target username
 		char *msg = strtok(NULL, "");    // Extract the rest of the input as the message
 
-		if (!target) {
+		if (target == NULL) {
 			printf("sendmsg: you have to specify target user\n");
 			continue;
 		}
 
-		if (!msg) {
+		if (msg == NULL) {
 			printf("sendmsg: you have to enter a message\n");
 			continue;
 		}
