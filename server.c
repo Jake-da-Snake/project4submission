@@ -37,7 +37,7 @@ int main() {
 			req.source, req.msg, req.target);
 		}
 		//save
-		target = open(req.target, O_WRONLY);
+		//target = open(req.target, O_WRONLY);
 		// TODO:
 		// open target FIFO and write the whole message struct to the target FIFO
 		// close target FIFO after writing the message
